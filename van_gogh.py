@@ -1,4 +1,4 @@
 from PIL import Image
 
-print("Hola mundo")
-
+string = "Hola mundo"
+print (string)
