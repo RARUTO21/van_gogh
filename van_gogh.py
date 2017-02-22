@@ -5,14 +5,16 @@ poblacionAnterior = []
 poblacionActual = []
 
 
-im = Image.open("b.jpg")
+im = Image.open("a2.png")
+im2 = Image.open("a.png")
 #im.show()
 
 arreglo = np.array(im)
+arreglo2 = np.array(im2)
 
 arr = im.load()
 
-print(arreglo[20,30])
+#print(arreglo[20,30])
 
 #print(arr.getpixel(20,30))
 
