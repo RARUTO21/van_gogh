@@ -131,9 +131,6 @@ def terminado():
         if(compararImagen(i,imagenMeta)) < 20:            
             print("Si cumple: ",compararImagen(i,imagenMeta))            
             return True
-        #a = Image.fromarray(i,"RGB")
-        #a.show()
-        #print(compararImagen(i,imagenMeta))
     return False
 
 def mutarPoblacion():
@@ -161,21 +158,7 @@ def collageImagenes():
         imagenSig = masAptos[posProxImagen]
         imagenResult = concatenarImagenes(imagenResult,imagenSig)
 
-##def concatenarImagenes(imagenAnt,imagenSig):
-##    
-##    for i in range(0,len(imagenAnt)-1):
-##        for j in imagenSig[i]:
-##            aix
-##
-##def convertToMatriz(imagen):
-##    matriz = []
-##    for i in range(0,len(imagen)):
-##            matriz.append([])
-##            for j in range(0,len(imagen[i])):
-##                matriz[i].append([])
-##                for k in range(0,3):
-##                    matriz[i][j].append([])
-##                    matriz[i][j][k] = imagen[]
+
 
 def euclidean_distance(x,y):
     return sqrt(sum(pow(a-b,2) for a, b in zip(x, y)))
