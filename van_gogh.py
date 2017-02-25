@@ -199,5 +199,5 @@ def obtenerMasApto(poblacionActual):
             
     print("El mejor de esta poblacion es de: %f"%compararImagen(imagenMeta,mejor))
     return mejor
-
+print("")
 
