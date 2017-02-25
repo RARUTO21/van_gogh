@@ -24,6 +24,13 @@ aim2 = np.array(im2)
 
 imagenMeta = aim
 
+
+def iniciarAlgoritmo():
+    while not terminado():
+        cruzarPoblacion()
+        mutarPoblacion()
+    print("Termino :O")
+
 def cargarImagenMeta(imagenDestino):
     global imagenMeta
     imagenMeta = np.array(Image.open(imagenDestino).convert("RGB"))
@@ -32,24 +39,27 @@ def cargarImagenMeta(imagenDestino):
 def cruzarPoblacion():
     global poblacionActual
     global poblacionAnterior
-
-    masAptos.append(obtenerMasApto(poblacionActual))
     
     poblacionTransicion = poblacionActual
-    poblacionActual = []
+   # poblacionActual = []
     poblacionAnterior = []
     
-    for i in range(0,sizePoblacion/2):
+    for i in range(0,sizePoblacion//2):
+        print("Iniciando generacion %d"%i)
         imagen1 = random.choice(poblacionTransicion)
+        print("Tipo de elemento de imagen1 es:")
+        print(type(imagen1))
         poblacionAnterior.append(imagen1)
-        poblacionTransicion.remove(imagen1)
-
+        #poblacionTransicion.remove(imagen1)
+        borrarElemento(poblacionTransicion,imagen1)
+        
         imagen2 = random.choice(poblacionTransicion)
         poblacionAnterior.append(imagen2)
-        poblacionTransicion.remove(imagen2)
+        #poblacionTransicion.remove(imagen2)
+        borrarElemento(poblacionTransicion,imagen1)
 
         if np.random.randint(0,100) < probCruce:
-            hijos = cruzarImagen(imagen1,imagen2)[0]
+            hijos = cruzarImagenes(imagen1,imagen2)[0]
             nuevaImagen1 = hijos[0]
             nuevaImagen2 = hijos[1]
             
@@ -58,10 +68,17 @@ def cruzarPoblacion():
         else:
             poblacionActual.append(imagen1)
             poblacionActual.append(imagen2)
-        
+            
+        masAptos.append(obtenerMasApto(poblacionActual)) #corregir esto porque estoy haciendo generaciones-1 si lo hago desde aqui
+        print("La similitud del mas apto de la generacion %d es: %f"%i%compararImagen(imagenMeta,masAptos[i]))
 
 
-def cruzarImagen(imagen1, imagen2):
+def borrarElemento(arreglo,elemento):
+    for i in arreglo:
+        if (i == elemento).any():
+            (arreglo.remove(i)).any()
+
+def cruzarImagenes(imagen1, imagen2):
     res = [None,None]
 
     corte = np.random.randint(1,len(imagen1)-1)
@@ -82,9 +99,17 @@ def menu():
     probCruce = float(input("Defina el % de probabilidad de cruce: "))
     probMutacion = float(input("Defina el % de probabilidad de mutación: "))
     cargarImagenMeta(rutaImagen)
+    GenerarPoblacionInicial(sizePoblacion)
+    print("")
+    print("Iniciando...")
+    print("")
+
+    iniciarAlgoritmo()
+    
 
     
 def GenerarPoblacionInicial(numImagenes):
+    
     global poblacionActual
     imagen = []
     while numImagenes > 0:
@@ -98,7 +123,7 @@ def GenerarPoblacionInicial(numImagenes):
         poblacionActual.append(np.array(imagen,dtype = "uint8"))
         imagen = []
         numImagenes -= 1
-    print(poblacionActual)
+    #print(poblacionActual)
 
 
 def terminado():
@@ -108,7 +133,7 @@ def terminado():
             return True
         #a = Image.fromarray(i,"RGB")
         #a.show()
-        print(compararImagen(i,imagenMeta))
+        #print(compararImagen(i,imagenMeta))
     return False
 
 def mutarPoblacion():
@@ -136,22 +161,22 @@ def collageImagenes():
         imagenSig = masAptos[posProxImagen]
         imagenResult = concatenarImagenes(imagenResult,imagenSig)
 
-def concatenarImagenes(imagenAnt,imagenSig):
-    
-    for i in range(0,len(imagenAnt)-1):
-        for j in imagenSig[i]:
-            aix
+##def concatenarImagenes(imagenAnt,imagenSig):
+##    
+##    for i in range(0,len(imagenAnt)-1):
+##        for j in imagenSig[i]:
+##            aix
+##
+##def convertToMatriz(imagen):
+##    matriz = []
+##    for i in range(0,len(imagen)):
+##            matriz.append([])
+##            for j in range(0,len(imagen[i])):
+##                matriz[i].append([])
+##                for k in range(0,3):
+##                    matriz[i][j].append([])
+##                    matriz[i][j][k] = imagen[]
 
-def convertToMatriz(imagen):
-    matriz = []
-    for i in range(0,len(imagen)):
-            matriz.append([])
-            for j in range(0,len(imagen[i])):
-                matriz[i].append([])
-                for k in range(0,3):
-                    matriz[i][j].append([])
-                    matriz[i][j][k] = imagen[]
-    
 def euclidean_distance(x,y):
     return sqrt(sum(pow(a-b,2) for a, b in zip(x, y)))
 
@@ -168,7 +193,7 @@ def compararImagen(imagen1,imagen2):
 def obtenerMasApto(poblacionActual):
     mejor = poblacionActual[0]
     for imagen in poblacionActual:
-        print(compararImagen(imagenMeta,imagen))
+        #print(compararImagen(imagenMeta,imagen))
         if compararImagen(imagenMeta,imagen) < compararImagen(imagenMeta,mejor):
             mejor = imagen
             
