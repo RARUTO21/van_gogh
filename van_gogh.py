@@ -22,8 +22,12 @@ def menu():
     print("Menu de Van Gogh")
     print("") 
     rutaImagen = input("Introduzca la ruta y nombre de la imagen: ")
-    print(rutaImagen)
-menu()
+    sizePoblacion = int(input("Introduzca el tamaño de la población: "))
+    probCruce = float(input("Introduzca el tamaño de la población: "))
+     
+    
+    #print(rutaImagen)
+#menu()
 
 def cargarImagenMeta(imagenDestino):
     global imagenMeta
@@ -61,7 +65,9 @@ def compararImagen(imagen1,imagen2):
     print(contador)
     avg = avg/contador
     return "El % de similitud es de: "+str(avg)
-    
+
+
+print("NADA")
 #def masApto
 
 
