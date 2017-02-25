@@ -8,12 +8,22 @@ from math import*
 
 poblacionAnterior = []
 poblacionActual = []
+<<<<<<< Updated upstream
 probM = 0.10
 imagenMeta = []
+=======
 
+masAptos = []
+>>>>>>> Stashed changes
+
+imagenMeta = []
+probCruce = 0
+probMutacion = 0
+sizePoblacion = 0
 
 im = Image.open("a.png").convert("RGB")
 im2 = Image.open("a2.png").convert("RGB")
+<<<<<<< Updated upstream
 im3 = Image.open("a3.png").convert("RGB")
 im4 = Image.open("a4.png").convert("RGB")
 arreglo = np.array(im)
@@ -21,34 +31,82 @@ arreglo2 = np.array(im2)
 arreglo3 = np.array(im3)
 arreglo4 = np.array(im4)
 imagenMeta = arreglo4
+=======
+aim = np.array(im)
+aim2 = np.array(im2)
+>>>>>>> Stashed changes
 
-def menu():
-    print("Menu de Van Gogh")
-    print("") 
-    rutaImagen = input("Introduzca la ruta y nombre de la imagen: ")
-    sizePoblacion = int(input("Introduzca el tamaño de la población: "))
-    probCruce = float(input("Introduzca el tamaño de la población: "))
-     
-    
-    #print(rutaImagen)
-#menu()
 
 def cargarImagenMeta(imagenDestino):
     global imagenMeta
-    
-    
+    imagenMeta = np.array(Image.open(imagenDestino).convert("RGB"))
 
-def generarPoblacionInicial(size):
-    cols = []
-    rows = []
 
+def cruzarPoblacion():
+    global poblacionActual
+    global poblacionAnterior
+
+    masAptos.append(obtenerMasApto(poblacionActual))
+    
+    poblacionTransicion = poblacionActual
+    poblacionActual = []
+    poblacionAnterior = []
+    
+    for i in range(0,sizePoblacion/2):
+        imagen1 = random.choice(poblacionTransicion)
+        poblacionAnterior.append(imagen1)
+        poblacionTransicion.remove(imagen1)
+
+        imagen2 = random.choice(poblacionTransicion)
+        poblacionAnterior.append(imagen2)
+        poblacionTransicion.remove(imagen2)
+
+        if np.random.randint(0,100) < probCruce:
+            hijos = cruzarImagen(imagen1,imagen2)[0]
+            nuevaImagen1 = hijos[0]
+            nuevaImagen2 = hijos[1]
+            
+            poblacionActual.append(nuevaImagen1)
+            poblacionActual.append(nuevaImagen2)
+        else:
+            poblacionActual.append(imagen1)
+            poblacionActual.append(imagen2)
+        
+
+
+<<<<<<< Updated upstream
 def generarPoblacionInicial(numImagenes):
+=======
+def cruzarImagen(imagen1, imagen2):
+    res = [None,None]
+
+    corte = np.random.randint(1,len(imagen1)-1)
+
+    res[0] = np.append(imagen1[:corte],imagen2[corte:],axis=0)
+    res[1] = np.append(imagen2[:corte],imagen1[corte:],axis=0)
+    return res
+
+
+def menu():
+    global sizePoblacion, probCruce, probMutacion
+
+    print("Menu de Van Gogh")
+    print("") 
+
+    rutaImagen = input("Introduzca la ruta y nombre de la imagen: ")
+    sizePoblacion = int(input("Introduzca el tamaño de la población: "))
+    probCruce = float(input("Defina el % de probabilidad de cruce: "))
+    probMutacion = float(input("Defina el % de probabilidad de mutación: "))
+    cargarImagenMeta(rutaImagen)
+    
+def GenerarPoblacionInicial(numImagenes):
+>>>>>>> Stashed changes
     global poblacionActual
     imagen = []
     while numImagenes > 0:
-        for i in range(0,len(arreglo)):
+        for i in range(0,len(imagenMeta)):
             imagen.append([])
-            for j in range(0,len(arreglo[i])):
+            for j in range(0,len(imagenMeta[i])):
                 imagen[i].append([])
                 for k in range(0,3):
                     imagen[i][j].append([])
@@ -58,6 +116,7 @@ def generarPoblacionInicial(numImagenes):
         numImagenes -= 1
     print(poblacionActual)
 
+<<<<<<< Updated upstream
 def terminado():
     for i in poblacionActual:
         if(compararImagen(i,imagenMeta)) < 20:            
@@ -108,6 +167,10 @@ def convertToMatriz(imagen):
                 for k in range(0,3):
                     matriz[i][j].append([])
                     matriz[i][j][k] = imagen[]
+=======
+def FuncionTerminado():
+    None
+>>>>>>> Stashed changes
     
 def euclidean_distance(x,y):
     return sqrt(sum(pow(a-b,2) for a, b in zip(x, y)))
@@ -119,10 +182,22 @@ def compararImagen(imagen1,imagen2):
         for j in range(0,len(imagen1[i])):
             avg += euclidean_distance(imagen1[i][j],imagen2[i][j])
             contador+=1
+<<<<<<< Updated upstream
     return avg/contador
 
+=======
+   
+    return avg/contador
+>>>>>>> Stashed changes
 
-print("NADA")
-#def masApto
+def obtenerMasApto(poblacionActual):
+    mejor = poblacionActual[0]
+    for imagen in poblacionActual:
+        print(compararImagen(imagenMeta,imagen))
+        if compararImagen(imagenMeta,imagen) < compararImagen(imagenMeta,mejor):
+            mejor = imagen
+            
+    print("El mejor de esta poblacion es de: %f"%compararImagen(imagenMeta,mejor))
+    return mejor
 
 
