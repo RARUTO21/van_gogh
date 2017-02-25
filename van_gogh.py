@@ -8,34 +8,21 @@ from math import*
 
 poblacionAnterior = []
 poblacionActual = []
-<<<<<<< Updated upstream
+
 probM = 0.10
 imagenMeta = []
-=======
-
 masAptos = []
->>>>>>> Stashed changes
 
-imagenMeta = []
 probCruce = 0
 probMutacion = 0
 sizePoblacion = 0
 
 im = Image.open("a.png").convert("RGB")
 im2 = Image.open("a2.png").convert("RGB")
-<<<<<<< Updated upstream
-im3 = Image.open("a3.png").convert("RGB")
-im4 = Image.open("a4.png").convert("RGB")
-arreglo = np.array(im)
-arreglo2 = np.array(im2)
-arreglo3 = np.array(im3)
-arreglo4 = np.array(im4)
-imagenMeta = arreglo4
-=======
 aim = np.array(im)
 aim2 = np.array(im2)
->>>>>>> Stashed changes
 
+imagenMeta = aim
 
 def cargarImagenMeta(imagenDestino):
     global imagenMeta
@@ -74,9 +61,6 @@ def cruzarPoblacion():
         
 
 
-<<<<<<< Updated upstream
-def generarPoblacionInicial(numImagenes):
-=======
 def cruzarImagen(imagen1, imagen2):
     res = [None,None]
 
@@ -98,9 +82,9 @@ def menu():
     probCruce = float(input("Defina el % de probabilidad de cruce: "))
     probMutacion = float(input("Defina el % de probabilidad de mutación: "))
     cargarImagenMeta(rutaImagen)
+
     
 def GenerarPoblacionInicial(numImagenes):
->>>>>>> Stashed changes
     global poblacionActual
     imagen = []
     while numImagenes > 0:
@@ -116,7 +100,7 @@ def GenerarPoblacionInicial(numImagenes):
         numImagenes -= 1
     print(poblacionActual)
 
-<<<<<<< Updated upstream
+
 def terminado():
     for i in poblacionActual:
         if(compararImagen(i,imagenMeta)) < 20:            
@@ -167,10 +151,6 @@ def convertToMatriz(imagen):
                 for k in range(0,3):
                     matriz[i][j].append([])
                     matriz[i][j][k] = imagen[]
-=======
-def FuncionTerminado():
-    None
->>>>>>> Stashed changes
     
 def euclidean_distance(x,y):
     return sqrt(sum(pow(a-b,2) for a, b in zip(x, y)))
@@ -182,13 +162,8 @@ def compararImagen(imagen1,imagen2):
         for j in range(0,len(imagen1[i])):
             avg += euclidean_distance(imagen1[i][j],imagen2[i][j])
             contador+=1
-<<<<<<< Updated upstream
     return avg/contador
 
-=======
-   
-    return avg/contador
->>>>>>> Stashed changes
 
 def obtenerMasApto(poblacionActual):
     mejor = poblacionActual[0]
