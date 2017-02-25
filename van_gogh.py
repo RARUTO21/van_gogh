@@ -7,7 +7,7 @@ poblacionAnterior = []
 poblacionActual = []
 
 
-im = Image.open("a2.png").convert("RGB")
+im = Image.open("b.jpg").convert("RGB")
 im2 = Image.open("a.png").convert("RGB")
 #im.show()
 
@@ -24,18 +24,24 @@ def generarPoblacionInicial(size):
     cols = []
     rows = []
 
-def GenerarPoblacionInicial():
-    global poblacionAnterior
-    generacion = []
-    for i in range(0,len(arreglo)):
-        generacion.append([])
-        for j in range(0,len(arreglo[i])):
-            generacion[i].append([])
-            for k in range(0,3):
-                generacion[i][j].append([])
-                generacion[i][j][k] = random.randint(0,32)
-    print(generacion)
-    poblacionAnterior = generacion
+def GenerarPoblacionInicial(numImagenes):
+    global poblacionActual
+    imagen = []
+    while numImagenes > 0:
+        for i in range(0,len(arreglo)):
+            imagen.append([])
+            for j in range(0,len(arreglo[i])):
+                imagen[i].append([])
+                for k in range(0,3):
+                    imagen[i][j].append([])
+                    imagen[i][j][k] = random.randint(0,32)        
+        poblacionActual.append(np.array(imagen,dtype = "uint8"))
+        imagen = []
+        numImagenes -= 1
+    print(poblacionActual)
+
+def FuncionTerminado():
+    
     
  
 def euclidean_distance(x,y):
