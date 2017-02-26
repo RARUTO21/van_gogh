@@ -8,9 +8,12 @@ from math import*
 
 poblacionAnterior = []
 poblacionActual = []
+pobActualOrdenada = []
 
 imagenMeta = []
 masAptos = []
+simMasAptoPAnt = 0
+simMasAptoPA = 1000
 
 probCruce = 0
 probMutacion = 0
@@ -27,9 +30,10 @@ imagenMeta = aim
 def iniciarAlgoritmo():
     contador = 0    
     while not terminado():
-        print("----------______________________----------")
+        print("Generacion %d"%contador)
         cruzarPoblacion()
         mutarPoblacion()
+        contador += 1
     a = obtenerMasApto(poblacionActual)
     b = Image.fromarray(a,"RGB")
     b.show()
@@ -46,14 +50,37 @@ def cruzarPoblacion():
     poblacionTransicion = poblacionActual
     poblacionActual = []
     poblacionAnterior = []
-    for i in range(0,sizePoblacion//2):
+    cont = 0
+    for i in range(0,sizePoblacion//2):        
         imagen1 = obtenerMasApto(poblacionTransicion)
         poblacionAnterior.append(imagen1)
-        np.delete(poblacionTransicion,imagen1)
-        imagen2 = obtenerMasApto(poblacionTransicion)
-        poblacionAnterior.append(imagen2)
-        np.delete(poblacionTransicion,imagen2)
-        if np.random.randint(0,100) < probCruce:
+        index = poblacionTransicion.index(imagen1)
+        poblacionTransicion.remove(imagen1)
+        if cont <= 0:
+            imagen2 = obtenerMenosApto(poblacionTransicion)
+            poblacionAnterior.append(imagen2)
+            poblacionTransicion.remove(imagen2)
+            cont+=1
+        elif cont == 4:
+            imagen2 = obtenerMasApto(poblacionTransicion)
+            poblacionAnterior.append(imagen2)
+            poblacionTransicion.remove(imagen2)
+            cont = 0
+        
+##        imagen1 = obtenerMasApto(poblacionTransicion)        
+##        poblacionAnterior.append(imagen1)
+##        index = poblacionTransicion.index(imagen1)
+##        #poblacionTransicion.pop(index)
+##        if index != len(poblacionTransicion)-1:
+##            imagen2 = poblacionTransicion[index+1]
+##            poblacionTransicion.pop(index)
+##            poblacionTransicion.pop(index)
+##        else:
+##            imagen2 = poblacionTransicion[index-1]
+##            poblacionTransicion.pop(index)
+##            poblacionTransicion.pop(index-1)
+##        poblacionAnterior.append(imagen2)        
+        if random.randint(0,100) < probCruce:
             hijos = cruzarImagenes(imagen1,imagen2)
             nuevaImagen1 = hijos[0]
             nuevaImagen2 = hijos[1]
@@ -62,16 +89,16 @@ def cruzarPoblacion():
         else:
             poblacionActual.append(imagen1)
             poblacionActual.append(imagen2)
-    masAptos.append(obtenerMasApto(poblacionActual)) #corregir esto porque estoy haciendo generaciones-1 si lo hago desde aqui
-    print("La similitud del mas apto de esta generacion es: %f"%compararImagen(imagenMeta,masAptos[len(masAptos)-1]))
+    #print(len(poblacionTransicion))
+    
 
 
 
 def cruzarImagenes(imagen1, imagen2):
     res = [None,None]
-    corte = np.random.randint(1,len(imagen1)-1)
-    res[0] = np.append(imagen1[:corte],imagen2[corte:],axis=0)
-    res[1] = np.append(imagen2[:corte],imagen1[corte:],axis=0)
+    corte = random.randint(1,len(imagen1)-1)
+    res[0] = imagen1[:corte]+imagen2[corte:]
+    res[1] = imagen2[:corte]+imagen1[corte:]
     return res
 
 
@@ -96,9 +123,8 @@ def menu():
 
     
 def GenerarPoblacionInicial(numImagenes):
-    
     global poblacionActual
-    imagen = []
+    imagen = []    
     while numImagenes > 0:
         for i in range(0,len(imagenMeta)):
             imagen.append([])
@@ -107,32 +133,68 @@ def GenerarPoblacionInicial(numImagenes):
                 for k in range(0,3):
                     imagen[i][j].append([])
                     imagen[i][j][k] = random.randint(0,255)        
-        poblacionActual.append(np.array(imagen,dtype = "uint8"))
+        poblacionActual.append(imagen)
         imagen = []
         numImagenes -= 1
+    print("Pob. inicial creada...")
     #print(poblacionActual)
 
 
 def terminado():
-    for i in poblacionActual:
-        if(compararImagen(i,imagenMeta)) < 100:            
-            print("Si cumple: ",compararImagen(i,imagenMeta))            
-            return True
+    if(simMasAptoPA) < 100:            
+        print("Si cumple: ",compararImagen(i,imagenMeta))            
+        return True
     return False
 
 def mutarPoblacion():
-    for imagen in poblacionActual:
-        imagen = mutarImagen(imagen)
+    global poblacionActual
+    global simMasAptoPA
+    poblacionTransicion = poblacionActual
+    poblacionActual = []
+    imagen = []
+    imagenMut = []
+    while poblacionTransicion != []:        
+        if len(poblacionTransicion)%8 == 2:
+            imagen = obtenerMasApto(poblacionTransicion)
+            imagenMut = mutarImagen(imagen)
+            poblacionActual.append(imagenMut)
+        elif len(poblacionTransicion)%4 == 0:
+            imagen = obtenerMenosApto(poblacionTransicion)
+            imagenMut = mutarImagen(imagen)
+            poblacionActual.append(imagenMut)
+        else:
+            imagen = random.choice(poblacionTransicion)
+            poblacionActual.append(imagen)
+        poblacionTransicion.remove(imagen)
+            
+            
+    ##for imagen in poblacionActual:
+    ##    imagen = mutarImagen(imagen)
+    masAptos.append(obtenerMasApto(poblacionActual))
+    if simMasAptoPA == 1000:
+        simMasAptoPA = compararImagen(imagenMeta,masAptos[len(masAptos)-1])                
+    else:
+        simMasAptoPAnt = simMasAptoPA
+        simMasAptoPA = compararImagen(imagenMeta,masAptos[len(masAptos)-1])                
+    print("La similitud del mas apto de esta generacion es: %f"%simMasAptoPA)
 
 def mutarImagen(imagen):
     mutados = []
-    cantMutar = ((np.size(imagenMeta)/3)*probMutacion)//1
+    
+    #if simMasAptoPAnt == 0:
+        
+    cantMutar = (((np.size(imagenMeta)/3)*probMutacion)//1)
+##    if simMasAptoPAnt < simMasAptoPA:
+##        cantMutar = ((((np.size(imagenMeta)/3)*probMutacion)//1)+((round((simMasAptoPA-simMasAptoPAnt)/2))*2))//1
+##    else:
+##        cantMutar = ((((np.size(imagenMeta)/3)*probMutacion)//1)-((round((simMAsApto-simMasAptoPAnt)/2))*0.7))//1
     while len(mutados) < cantMutar:
-            row = random.randint(0,len(imagenMeta)-1)
-            column = random.randint(0,len(imagenMeta[0])-1)
-            if [row,column] not in mutados:
-                imagen[row][column] = [random.randint(25,240),random.randint(25,240),random.randint(25,240)]
-                mutados.append([row,column])
+        row = random.randint(0,len(imagenMeta)-1)
+        column = random.randint(0,len(imagenMeta[0])-1)
+        if [row,column] not in mutados:
+            imagen[row][column] = [random.randint(0,255),random.randint(0,255),random.randint(0,255)]
+            mutados.append([row,column])
+        
     return imagen
 
 def collageImagenes():
@@ -166,7 +228,6 @@ def convertToMatriz(imagen):
                     matriz[i][j][k] = imagen[i][j][k]
     return matriz
   
-  
 def euclidean_distance(x,y):
     return sqrt(sum(pow(a-b,2) for a, b in zip(x, y)))
 
@@ -194,10 +255,22 @@ def obtenerMenosApto(poblacionActual):
     peor = poblacionActual[0]
     for imagen in poblacionActual:
         #print(compararImagen(imagenMeta,imagen))
-        if compararImagen(imagenMeta,imagen) < compararImagen(imagenMeta,peor):
+        if compararImagen(imagenMeta,imagen) > compararImagen(imagenMeta,peor):
             peor = imagen            
     #print("El mejor de esta poblacion es de: %f"%compararImagen(imagenMeta,mejor))
     return peor
 print("")
 
+def ordenarPorSimilitud():
+    pobTemporal = poblacionActual
+    while len(pobTemporal)>0:
+        masAptoTemp = obtenerMasApto(pobTemporal)
+        pobActualIrdenada.append(masAptoTemp)
+        pobTemporal.remove(masAptoTemp)
+
 menu()
+
+##Introduzca la ruta y nombre de la imagen: a4.png
+##Introduzca el tamaño de la población: 27
+##Defina el % de probabilidad de cruce: 60
+##Defina el % de probabilidad de mutación: 0.02
