@@ -26,9 +26,12 @@ imagenMeta = aim
 
 
 def iniciarAlgoritmo():
+    contador = 0
     while not terminado():
         cruzarPoblacion()
         mutarPoblacion()
+        print("Iniciando generacion %d"%contador)
+        
     print("Termino :O")
 
 def cargarImagenMeta(imagenDestino):
@@ -45,21 +48,21 @@ def cruzarPoblacion():
     poblacionAnterior = []
     
     for i in range(0,sizePoblacion//2):
-        print("Iniciando generacion %d"%i)
+        
         imagen1 = random.choice(poblacionTransicion)
         print("Tipo de elemento de imagen1 es:")
         print(type(imagen1))
         poblacionAnterior.append(imagen1)
         #poblacionTransicion.remove(imagen1)
-        borrarElemento(poblacionTransicion,imagen1)
+        np.delete(poblacionTransicion,imagen1)
         
         imagen2 = random.choice(poblacionTransicion)
         poblacionAnterior.append(imagen2)
         #poblacionTransicion.remove(imagen2)
-        borrarElemento(poblacionTransicion,imagen1)
+        np.delete(poblacionTransicion,imagen2)
 
         if np.random.randint(0,100) < probCruce:
-            hijos = cruzarImagenes(imagen1,imagen2)[0]
+            hijos = cruzarImagenes(imagen1,imagen2)
             nuevaImagen1 = hijos[0]
             nuevaImagen2 = hijos[1]
             
@@ -70,13 +73,9 @@ def cruzarPoblacion():
             poblacionActual.append(imagen2)
             
         masAptos.append(obtenerMasApto(poblacionActual)) #corregir esto porque estoy haciendo generaciones-1 si lo hago desde aqui
-        print("La similitud del mas apto de la generacion %d es: %f"%i%compararImagen(imagenMeta,masAptos[i]))
+        print("La similitud del mas apto de esta generacion es: %f"%compararImagen(imagenMeta,masAptos[i]))
 
 
-def borrarElemento(arreglo,elemento):
-    for i in arreglo:
-        if (i == elemento).any():
-            (arreglo.remove(i)).any()
 
 def cruzarImagenes(imagen1, imagen2):
     res = [None,None]
@@ -158,7 +157,7 @@ def collageImagenes():
         imagenSig = masAptos[posProxImagen]
         imagenResult = concatenarImagenes(imagenResult,imagenSig)
 
- def concatenarImagenes(imagenAnt,imagenSig):
+def concatenarImagenes(imagenAnt,imagenSig):
      imagenAnt = convertToMatriz(imagenAnt)
      imagenSig = convertToMatriz(imagenSig)
      for i in range(0,len(imagenAnt)):
@@ -168,13 +167,13 @@ def collageImagenes():
             imagenAnt[i].append(j)
      return np.array(imagenAnt,dtype="uint8")
     
- def convertToMatriz(imagen):
+def convertToMatriz(imagen):
     matriz = []
     for i in range(0,len(imagen)):
         matriz.append([])
         for j in range(0,len(imagen[i])):
            matriz[i].append([])
-                for k in range(0,3):
+           for k in range(0,3):
                     matriz[i][j].append([])
                     matriz[i][j][k] = imagen[i][j][k]
     return matriz
