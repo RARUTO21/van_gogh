@@ -9,7 +9,6 @@ from math import*
 poblacionAnterior = []
 poblacionActual = []
 
-probM = 0.10
 imagenMeta = []
 masAptos = []
 
@@ -26,12 +25,14 @@ imagenMeta = aim
 
 
 def iniciarAlgoritmo():
-    contador = 0
+    contador = 0    
     while not terminado():
+        print("----------______________________----------")
         cruzarPoblacion()
         mutarPoblacion()
-        print("Iniciando generacion %d"%contador)
-        
+    a = obtenerMasApto(poblacionActual)
+    b = Image.fromarray(a,"RGB")
+    b.show()
     print("Termino :O")
 
 def cargarImagenMeta(imagenDestino):
@@ -42,46 +43,33 @@ def cargarImagenMeta(imagenDestino):
 def cruzarPoblacion():
     global poblacionActual
     global poblacionAnterior
-    
     poblacionTransicion = poblacionActual
-   # poblacionActual = []
+    poblacionActual = []
     poblacionAnterior = []
-    
     for i in range(0,sizePoblacion//2):
-        
-        imagen1 = random.choice(poblacionTransicion)
-        print("Tipo de elemento de imagen1 es:")
-        print(type(imagen1))
+        imagen1 = obtenerMasApto(poblacionTransicion)
         poblacionAnterior.append(imagen1)
-        #poblacionTransicion.remove(imagen1)
         np.delete(poblacionTransicion,imagen1)
-        
-        imagen2 = random.choice(poblacionTransicion)
+        imagen2 = obtenerMasApto(poblacionTransicion)
         poblacionAnterior.append(imagen2)
-        #poblacionTransicion.remove(imagen2)
         np.delete(poblacionTransicion,imagen2)
-
         if np.random.randint(0,100) < probCruce:
             hijos = cruzarImagenes(imagen1,imagen2)
             nuevaImagen1 = hijos[0]
             nuevaImagen2 = hijos[1]
-            
             poblacionActual.append(nuevaImagen1)
             poblacionActual.append(nuevaImagen2)
         else:
             poblacionActual.append(imagen1)
             poblacionActual.append(imagen2)
-            
-        masAptos.append(obtenerMasApto(poblacionActual)) #corregir esto porque estoy haciendo generaciones-1 si lo hago desde aqui
-        print("La similitud del mas apto de esta generacion es: %f"%compararImagen(imagenMeta,masAptos[i]))
+    masAptos.append(obtenerMasApto(poblacionActual)) #corregir esto porque estoy haciendo generaciones-1 si lo hago desde aqui
+    print("La similitud del mas apto de esta generacion es: %f"%compararImagen(imagenMeta,masAptos[len(masAptos)-1]))
 
 
 
 def cruzarImagenes(imagen1, imagen2):
     res = [None,None]
-
     corte = np.random.randint(1,len(imagen1)-1)
-
     res[0] = np.append(imagen1[:corte],imagen2[corte:],axis=0)
     res[1] = np.append(imagen2[:corte],imagen1[corte:],axis=0)
     return res
@@ -127,7 +115,7 @@ def GenerarPoblacionInicial(numImagenes):
 
 def terminado():
     for i in poblacionActual:
-        if(compararImagen(i,imagenMeta)) < 20:            
+        if(compararImagen(i,imagenMeta)) < 100:            
             print("Si cumple: ",compararImagen(i,imagenMeta))            
             return True
     return False
@@ -138,12 +126,12 @@ def mutarPoblacion():
 
 def mutarImagen(imagen):
     mutados = []
-    cantMutar = ((np.size(imagenMeta)/3)*probM)//1
+    cantMutar = ((np.size(imagenMeta)/3)*probMutacion)//1
     while len(mutados) < cantMutar:
             row = random.randint(0,len(imagenMeta)-1)
             column = random.randint(0,len(imagenMeta[0])-1)
             if [row,column] not in mutados:
-                imagen[row][column] = [random.randint(0,255),random.randint(0,255),random.randint(0,255)]
+                imagen[row][column] = [random.randint(25,240),random.randint(25,240),random.randint(25,240)]
                 mutados.append([row,column])
     return imagen
 
@@ -199,7 +187,17 @@ def obtenerMasApto(poblacionActual):
         if compararImagen(imagenMeta,imagen) < compararImagen(imagenMeta,mejor):
             mejor = imagen
             
-    print("El mejor de esta poblacion es de: %f"%compararImagen(imagenMeta,mejor))
+    #print("El mejor de esta poblacion es de: %f"%compararImagen(imagenMeta,mejor))
     return mejor
+
+def obtenerMenosApto(poblacionActual):
+    peor = poblacionActual[0]
+    for imagen in poblacionActual:
+        #print(compararImagen(imagenMeta,imagen))
+        if compararImagen(imagenMeta,imagen) < compararImagen(imagenMeta,peor):
+            peor = imagen            
+    #print("El mejor de esta poblacion es de: %f"%compararImagen(imagenMeta,mejor))
+    return peor
 print("")
 
+menu()
