@@ -7,6 +7,7 @@ from math import*
 
 poblacionAnterior = []
 poblacionActual = []
+ordenada = []
 
 imagenMeta = []
 masAptos = []
@@ -35,18 +36,18 @@ def cargarImagenMeta(imagenDestino):
 
 
 def cruzarPoblacion():
-    global poblacionActual
-    global poblacionAnterior
-    poblacionTransicion = poblacionActual
+    global poblacionActual,poblacionAnterior,ordenada
+    ordenada = ordenarMasApto(poblacionActual)    
     poblacionActual = []
     poblacionAnterior = []
+    cont = 0
     for i in range(0,sizePoblacion//2):        
-        imagen1 = obtenerMasApto(poblacionTransicion)
+        imagen1 = ordenada[cont]
         poblacionAnterior.append(imagen1)
-        poblacionTransicion.remove(imagen1)
-        imagen2 = obtenerMasApto(poblacionTransicion)
+        cont+=1
+        imagen2 = ordenada[cont]
         poblacionAnterior.append(imagen2)
-        poblacionTransicion.remove(imagen2)        
+        cont+=1
         if random.randint(0,100) < probCruce:
             hijos = cruzarImagenes(imagen1,imagen2)
             nuevaImagen1 = hijos[0]
@@ -104,23 +105,32 @@ def terminado():
 def mutarPoblacion():
     global poblacionActual
     global simMasAptoPA
-    poblacionTransicion = poblacionActual
+    ordenada = ordenarMasApto(poblacionActual)
     poblacionActual = []
     imagen = []
-    imagenMut = []
-    while poblacionTransicion != []:        
-        if len(poblacionTransicion)%8 == 2:
-            imagen = obtenerMasApto(poblacionTransicion)
-            imagenMut = mutarImagen(imagen)
-            poblacionActual.append(imagenMut)
-        elif len(poblacionTransicion)%4 == 0:
-            imagen = obtenerMenosApto(poblacionTransicion)
-            imagenMut = mutarImagen(imagen)
-            poblacionActual.append(imagenMut)
-        else:
-            imagen = random.choice(poblacionTransicion)
+    contMasApto = 0
+    contMenosApto = 0
+    indexImageMutadas = []
+    indicador = 0
+    for i in range(0,len(ordenada)):
+        if indicador%(len(ordenada)-1) == 0: 
+            imagen = ordenada[contMasApto]
+            imagen = mutarImagen(imagen)
             poblacionActual.append(imagen)
-        poblacionTransicion.remove(imagen)
+            contMasApto+=1
+        elif indicador%10 == 0:
+            imagen = ordenada[(len(ordenada)-1)-contMenosApto]
+            imagen = mutarImagen(imagen)
+            poblacionActual.append(imagen)
+            contMenosApto+=1
+        else:
+            imagen = []
+            while imagen == []:
+                index = random.randint(contMasApto,(len(ordenada)-1)-contMenosApto)            
+                if index not in indexImageMutadas:
+                    imagen = ordenada[index]
+                    poblacionActual.append(imagen)
+        indicador+=1   
             
             
     ##for imagen in poblacionActual:
@@ -210,7 +220,20 @@ def obtenerMenosApto(poblacionActual):
             peor = imagen            
     return peor
 
+def ordenarMasApto(poblacionActual):
+    global ordenada,imagenMeta
+    ordenada = []
+    for imagen in poblacionActual:
+        similitud = compararImagen(imagenMeta,imagen)
+        imagen.append([similitud])
+        ordenada.append(imagen)
+    ordenada = sorted(ordenada, key = myKey)
+    for imagen in ordenada:
+        imagen.remove(imagen[len(imagen)-1])
+    return ordenada
 
+def myKey(item):
+    return item[len(item)-1]
 
 menu()
 

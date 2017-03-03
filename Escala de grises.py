@@ -18,15 +18,19 @@ probCruce = 0
 probMutacion = 0
 sizePoblacion = 0
 
+tipoCruce = 1
+
 
 #LISTA
 def iniciarAlgoritmo():
+    global tipoCruce
     contador = 0    
     while not terminado():
         print("Generacion %d"%contador)
         cruzarPoblacion()
         mutarPoblacion()
         contador += 1
+        tipoCruce+=1
     a = obtenerMasApto(poblacionActual)
     b = Image.fromarray(a,"L")
     b.show()
@@ -46,13 +50,29 @@ def cruzarPoblacion():
     poblacionActual = []
     poblacionAnterior = []
     contador = 0
-    for i in range(0,sizePoblacion//2):
+    contador2 = 0
+    indicador = 0
+    for i in range(0,sizePoblacion//2): #Size de poblacion debe ser mayor a 4
+        if i!=0 and tipoCruce%50!=0 and tipoCruce%25!=0 and i%2==0 and (contador+4)!=len(ordenada) :
+            contador+=2
+        #print("Iteracion: ",i,"\n1--> ",contador)
         imagen1 = ordenada[contador]
         poblacionAnterior.append(imagen1)
         contador+=1
-        imagen2 = ordenada[contador]
-        poblacionAnterior.append(imagen2)        
-        contador+=1
+        if tipoCruce%50 == 0:
+            #print("\nTipo de cruce cambio\n")
+            imagen2 = ordenada[((sizePoblacion//2)-1)+contador]
+            poblacionAnterior.append(imagen2)            
+##        if indicador%2 == 0:
+##            imagen2 = ordenada[(((sizePoblacion//2)//2)-1)+contador2]
+##            poblacionAnterior.append(imagen2)
+##            contador2+=1
+        
+        else:
+            imagen2 = ordenada[contador+1]
+            poblacionAnterior.append(imagen2)
+        #print("2--> ",contador+1)
+        
         if random.randint(0,100) < probCruce:
             hijos = cruzarImagenes(imagen1,imagen2)
             nuevaImagen1 = hijos[0]
@@ -62,6 +82,8 @@ def cruzarPoblacion():
         else:
             poblacionActual.append(imagen1)
             poblacionActual.append(imagen2)
+        indicador+=1
+        
 #LISTA
 def cruzarImagenes(imagen1, imagen2):
     res = [None,None]
@@ -74,8 +96,8 @@ def cruzarImagenes(imagen1, imagen2):
 def menu():
     global sizePoblacion, probCruce, probMutacion
     print("Menu de Van Gogh\n") 
-    rutaImagen = input("Introduzca la ruta y nombre de la imagen: ")
-    sizePoblacion = int(input("Introduzca el tamaño de la población: "))
+    rutaImagen = "a4.png"#input("Introduzca la ruta y nombre de la imagen: ")
+    sizePoblacion = 31 #int(input("Introduzca el tamaño de la población: "))
     probCruce = float(input("Defina el % de probabilidad de cruce: "))
     probMutacion = float(input("Defina el % de probabilidad de mutación: "))
     cargarImagenMeta(rutaImagen)
@@ -118,13 +140,13 @@ def mutarPoblacion():
     indicador = 0
 #    while poblacionTransicion != []:
     for i in range(0,len(ordenada)):
-        if indicador%8 == 0:            
+        if indicador%(len(ordenada)-1) == 0:            
             #imagen = obtenerMasApto(poblacionTransicion)
             imagen = ordenada[contMasApto]
             imagen = mutarImagen(imagen)
             poblacionActual.append(imagen)
             contMasApto+=1
-        elif indicador%4 == 0:            
+        elif indicador%10 == 0:     
             #imagen = obtenerMenosApto(poblacionTransicion)
             imagen = ordenada[(len(ordenada)-1)-contMenosApto]
             imagen = mutarImagen(imagen)
@@ -156,13 +178,12 @@ def mutarImagen(imagen):
         row = random.randint(0,len(imagenMeta)-1)
         column = random.randint(0,len(imagenMeta[0])-1)
         if [row,column] not in mutados:
-            if imagen[row][column] in range(0,64):
-                imagen[row][column] = random.randint(64,192)
-            elif imagen[row][column] in range(64,192):
-                imagen[row][column] = random.randint(192,255)
+            if imagen[row][column] < 128:
+                imagen[row][column] = random.randint(230,255)
+                mutados.append([row,column])
             else:
-                imagen[row][column] = random.randint(0,64)
-            mutados.append([row,column])
+                imagen[row][column] =  random.randint(0,25)
+                mutados.append([row,column])
     return imagen
 
 def mutarImagen1(imagen):
@@ -260,3 +281,4 @@ def ordenarMasApto(poblacionActual):
 #LISTA    
 def myKey(item):
     return item[len(item)-1]
+menu()
