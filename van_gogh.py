@@ -60,6 +60,7 @@ def cruzarPoblacion():
 
 def cruzarImagenes(imagen1, imagen2):
     res = [None,None]
+    
     corte = random.randint(1,len(imagen1)-1)
     res[0] = imagen1[:corte]+imagen2[corte:]
     res[1] = imagen2[:corte]+imagen1[corte:]
@@ -93,7 +94,6 @@ def GenerarPoblacionInicial(numImagenes):
         imagen = []
         numImagenes -= 1
     print("\nPob. inicial creada...")
-    #print(poblacionActual)
 
 
 def terminado():
@@ -131,10 +131,6 @@ def mutarPoblacion():
                     imagen = ordenada[index]
                     poblacionActual.append(imagen)
         indicador+=1   
-            
-            
-    ##for imagen in poblacionActual:
-    ##    imagen = mutarImagen(imagen)
     masAptos.append(obtenerMasApto(poblacionActual))
     if simMasAptoPA == 1000:
         simMasAptoPA = compararImagen(imagenMeta,masAptos[len(masAptos)-1])                
@@ -145,14 +141,7 @@ def mutarPoblacion():
 
 def mutarImagen(imagen):
     mutados = []
-    
-    #if simMasAptoPAnt == 0:
-        
     cantMutar = (((np.size(imagenMeta)/3)*probMutacion)//1)
-##    if simMasAptoPAnt < simMasAptoPA:
-##        cantMutar = ((((np.size(imagenMeta)/3)*probMutacion)//1)+((round((simMasAptoPA-simMasAptoPAnt)/2))*2))//1
-##    else:
-##        cantMutar = ((((np.size(imagenMeta)/3)*probMutacion)//1)-((round((simMAsApto-simMasAptoPAnt)/2))*0.7))//1
     while len(mutados) < cantMutar:
         row = random.randint(0,len(imagenMeta)-1)
         column = random.randint(0,len(imagenMeta[0])-1)
@@ -176,9 +165,7 @@ def concatenarImagenes(imagenAnt,imagenSig):
      imagenAnt = convertToMatriz(imagenAnt)
      imagenSig = convertToMatriz(imagenSig)
      for i in range(0,len(imagenAnt)):
-        #print("Fila I1: ",imagenAnt[i])
           for j in imagenSig[i]:
-             #print("Columna a insert: ",j)
             imagenAnt[i].append(j)
      return np.array(imagenAnt,dtype="uint8")
     
