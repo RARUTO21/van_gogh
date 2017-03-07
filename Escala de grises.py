@@ -19,21 +19,23 @@ probMutacion = 0
 sizePoblacion = 0
 
 tipoCruce = 1
-
+generacion = 0
 
 #LISTA
 def iniciarAlgoritmo():
-    global tipoCruce
+    global tipoCruce,generacion
     contador = 0    
     while not terminado():
         print("Generacion %d"%contador)
         cruzarPoblacion()
-        mutarPoblacion()
-        contador += 1
+        mutarPoblacion()        
         tipoCruce+=1
-    a = obtenerMasApto(poblacionActual)
-    b = Image.fromarray(a,"L")
-    b.show()
+        if contador%3 == 0 and generacion != 37:
+            generacion+=1
+        contador += 1
+    mejorImagen = np.array(masAptos[len(masAptos)-1],dtype="uint8")
+    a = Image.fromarray(mejorImagen,"L")
+    a.show()
     print("Termino :O")
 
 #LISTA
@@ -97,7 +99,7 @@ def menu():
     global sizePoblacion, probCruce, probMutacion
     print("Menu de Van Gogh\n") 
     rutaImagen = "a4.png"#input("Introduzca la ruta y nombre de la imagen: ")
-    sizePoblacion = 31 #int(input("Introduzca el tamaño de la población: "))
+    sizePoblacion = 10 #int(input("Introduzca el tamaño de la población: "))
     probCruce = float(input("Defina el % de probabilidad de cruce: "))
     probMutacion = float(input("Defina el % de probabilidad de mutación: "))
     cargarImagenMeta(rutaImagen)
@@ -122,7 +124,7 @@ def GenerarPoblacionInicial(numImagenes):
 
 #LISTA
 def terminado():
-    if(simMasAptoPA) < 1:            
+    if(simMasAptoPA) < 0.1:            
         return True
     return False
 
@@ -140,13 +142,13 @@ def mutarPoblacion():
     indicador = 0
 #    while poblacionTransicion != []:
     for i in range(0,len(ordenada)):
-        if indicador%(len(ordenada)-1) == 0:            
+        if indicador%8 == 0:            
             #imagen = obtenerMasApto(poblacionTransicion)
             imagen = ordenada[contMasApto]
             imagen = mutarImagen(imagen)
             poblacionActual.append(imagen)
             contMasApto+=1
-        elif indicador%10 == 0:     
+        elif indicador%3 == 0:     
             #imagen = obtenerMenosApto(poblacionTransicion)
             imagen = ordenada[(len(ordenada)-1)-contMenosApto]
             imagen = mutarImagen(imagen)
@@ -172,18 +174,20 @@ def mutarPoblacion():
 
 #LISTA
 def mutarImagen(imagen):
+    global generacion
     mutados = []       
     cantMutar = (((np.size(imagenMeta)/3)*probMutacion)//1)
     while len(mutados) < cantMutar:
         row = random.randint(0,len(imagenMeta)-1)
         column = random.randint(0,len(imagenMeta[0])-1)
         if [row,column] not in mutados:
-            if imagen[row][column] < 128:
-                imagen[row][column] = random.randint(230,255)
-                mutados.append([row,column])
+            if (imagenMeta[row][column]-40-generacion)<0:
+                imagen[row][column] = imagenMeta[row][column]
+            elif (imagenMeta[row][column]+40-generacion)>255:
+                imagen[row][column] = imagenMeta[row][column]
             else:
-                imagen[row][column] =  random.randint(0,25)
-                mutados.append([row,column])
+                imagen[row][column] = imagenMeta[row][column]
+            mutados.append([row,column])
     return imagen
 
 def mutarImagen1(imagen):
@@ -212,7 +216,7 @@ def compararImagen(imagen1,imagen2):
     avg = 0
     contador = 0
     for i in range(0,len(imagen1)):
-        avg += euclidean_distance(imagen1[i],imagen2[i])
+        avg += entropiaDistance(imagen1[i],imagen2[i])
         contador+=len(imagen1)
     return avg/contador
 
@@ -248,9 +252,7 @@ def concatenarImagenes(imagenAnt,imagenSig):
      imagenAnt = convertToMatriz(imagenAnt)
      imagenSig = convertToMatriz(imagenSig)
      for i in range(0,len(imagenAnt)):
-        #print("Fila I1: ",imagenAnt[i])
           for j in imagenSig[i]:
-             #print("Columna a insert: ",j)
             imagenAnt[i].append(j)
      return np.array(imagenAnt,dtype="uint8")
     
@@ -281,4 +283,19 @@ def ordenarMasApto(poblacionActual):
 #LISTA    
 def myKey(item):
     return item[len(item)-1]
+
+
+def entropiaDistance(x,y):
+    suma = 0
+    for a, b in zip(x, y):
+        if a-b < 0:
+            suma+= a-b+255
+        else:
+            suma+= a-b
+    return sqrt(suma)
+
+##def cuadricularImagen():
+##    global imagenMeta
+##    for i in imagenMeta:
+##        if 
 menu()
